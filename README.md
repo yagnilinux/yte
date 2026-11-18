@@ -1,6 +1,6 @@
 # yte
 
-yagni text editor, for [YAGNI Linux](https://yagnilinux.github.io).
+yagni text editor, for [YAGNI Linux](https://yagni-linux.codeberg.page).
 
 ```sh
 $ musl-gcc -std=c99 -Os -s -static -o yte yte.c
