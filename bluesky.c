@@ -1,4 +1,4 @@
-/* yte: text editor */
+/* bluesky: text editor */
 #define _GNU_SOURCE
 #include <ctype.h>
 #include <errno.h>
@@ -119,7 +119,7 @@ static void die(const char *s) {
 
 static void *xrealloc(void *p, size_t n) {
     void *q = realloc(p, n ? n : 1);
-    if (!q) { disable_raw(); fputs("yte: out of memory\n", stderr); exit(1); }
+    if (!q) { disable_raw(); fputs("bluesky: out of memory\n", stderr); exit(1); }
     return q;
 }
 
@@ -841,7 +841,7 @@ static int save_atomic(const char *path, long *total) {
     sl = strrchr(real, '/');
     if (sl) { snprintf(dir, sizeof dir, "%.*s", sl == real ? 1 : (int)(sl - real), real); base = sl + 1; }
     else { snprintf(dir, sizeof dir, "."); base = real; }
-    snprintf(tmp, sizeof tmp, "%s/.%s.yte-XXXXXX", dir, base);
+    snprintf(tmp, sizeof tmp, "%s/.%s.bluesky-XXXXXX", dir, base);
     fd = mkstemp(tmp);
     if (fd < 0) return save_direct(path, total);
     um = umask(0);
@@ -866,7 +866,7 @@ static int save_atomic(const char *path, long *total) {
 static void rescue(void) {
     char p[PATH_MAX + 8], *where = NULL;
     if (E.nrows && is_dirty()) {
-        snprintf(p, sizeof p, "%s.save", E.filename ? E.filename : "yte");
+        snprintf(p, sizeof p, "%s.save", E.filename ? E.filename : "bluesky");
         FILE *f = fopen(p, "wb");
         if (f) {
             write_rows(f, NULL);
@@ -874,7 +874,7 @@ static void rescue(void) {
         }
     }
     disable_raw();
-    if (where) fprintf(stderr, "yte: terminal went away - your text was saved to %s\n", where);
+    if (where) fprintf(stderr, "bluesky: terminal went away - your text was saved to %s\n", where);
     exit(1);
 }
 
@@ -1515,10 +1515,10 @@ static void process_key(int c) {
 
 
 static void usage(void) {
-    puts("yte " VERSION " - yagni text editor\n\n"
-         "usage: yte [+line] [file]   edit file (new if it doesn't exist)\n"
-         "       cmd | yte            edit piped text, then save it with Ctrl-S\n"
-         "       yte -h | -v          help | version\n\n"
+    puts("bluesky " VERSION " - text editor\n\n"
+         "usage: bluesky [+line] [file]   edit file (new if it doesn't exist)\n"
+         "       cmd | bluesky            edit piped text, then save it with Ctrl-S\n"
+         "       bluesky -h | -v          help | version\n\n"
          "Keys:");
     for (int g = 0; g < NKEYS; g++) {
         printf("\n  %s\n", keys[g].title);
@@ -1550,22 +1550,22 @@ int main(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
         const char *a = argv[i];
         if (!strcmp(a, "-h")) { usage(); return 0; }
-        if (!strcmp(a, "-v")) { puts("yte " VERSION); return 0; }
+        if (!strcmp(a, "-v")) { puts("bluesky " VERSION); return 0; }
         if (a[0] == '+' && isdigit((unsigned char)a[1])) line = atoi(a + 1);
         else if (a[0] != '-' && !file) file = a;
-        else { fprintf(stderr, "yte: bad argument '%s' (try -h)\n", a); return 1; }
+        else { fprintf(stderr, "bluesky: bad argument '%s' (try -h)\n", a); return 1; }
     }
     if (!isatty(STDIN_FILENO)) {
         if (!file) { load_stream(stdin); piped = 1; }
         int t = open("/dev/tty", O_RDWR);
-        if (t < 0 || dup2(t, STDIN_FILENO) < 0) { fputs("yte: no terminal available\n", stderr); return 1; }
+        if (t < 0 || dup2(t, STDIN_FILENO) < 0) { fputs("bluesky: no terminal available\n", stderr); return 1; }
         close(t);
     }
-    if (!isatty(STDOUT_FILENO)) { fputs("yte: stdout is not a terminal\n", stderr); return 1; }
+    if (!isatty(STDOUT_FILENO)) { fputs("bluesky: stdout is not a terminal\n", stderr); return 1; }
 
     E.promptcol = -1;
     if (file) {
-        if (open_file_cmd(file, err, sizeof err)) { fprintf(stderr, "yte: %s\n", err); return 1; }
+        if (open_file_cmd(file, err, sizeof err)) { fprintf(stderr, "bluesky: %s\n", err); return 1; }
     } else {
         if (!E.nrows) insert_row(0, "", 0);
         if (piped) E.saved = -1;
